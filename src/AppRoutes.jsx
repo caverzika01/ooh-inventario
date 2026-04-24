@@ -10,25 +10,25 @@ import { supabase } from './lib/supabase'
 
 function Layout({ children }) {
   return (
-    <div className="min-h-screen bg-gray-100">
-      <nav className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="flex items-center gap-8">
-          <span className="font-semibold text-gray-800">OOH Inventário</span>
-            <div className="ml-auto">
-              <button
-                onClick={() => supabase.auth.signOut()}
-                className="text-gray-400 text-sm hover:text-gray-600"
-              >
-                Sair
-              </button>
-</div>
-          <NavLink to="/" className={({ isActive }) => isActive ? 'text-blue-600 font-medium text-sm' : 'text-gray-500 text-sm hover:text-gray-800'}>Dashboard</NavLink>
-          <NavLink to="/clientes" className={({ isActive }) => isActive ? 'text-blue-600 font-medium text-sm' : 'text-gray-500 text-sm hover:text-gray-800'}>Clientes</NavLink>
-          <NavLink to="/contratos" className={({ isActive }) => isActive ? 'text-blue-600 font-medium text-sm' : 'text-gray-500 text-sm hover:text-gray-800'}>Contratos</NavLink>
-          <NavLink to="/receita" className={({ isActive }) => isActive ? 'text-blue-600 font-medium text-sm' : 'text-gray-500 text-sm hover:text-gray-800'}>Receita</NavLink>
-          <NavLink to="/dre" className={({ isActive }) => isActive ? 'text-blue-600 font-medium text-sm' : 'text-gray-500 text-sm hover:text-gray-800'}>DRE</NavLink>
-          <NavLink to="/fluxo-caixa" className={({ isActive }) => isActive ? 'text-blue-600 font-medium text-sm' : 'text-gray-500 text-sm hover:text-gray-800'}>Fluxo de Caixa</NavLink>
-          <NavLink to="/despesas" className={({ isActive }) => isActive ? 'text-blue-600 font-medium text-sm' : 'text-gray-500 text-sm hover:text-gray-800'}>Despesas</NavLink>
+    <div className="min-h-screen" style={{ background: 'linear-gradient(to bottom, #4c1d95, #ffffff)' }}>
+      <nav className="px-6 py-4" style={{ background: '#000000' }}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-8">
+            <span className="font-semibold text-white">OOH Inventário</span>
+            <NavLink to="/" className={({ isActive }) => isActive ? 'text-white font-medium text-sm' : 'text-purple-300 text-sm hover:text-white'}>Dashboard</NavLink>
+            <NavLink to="/clientes" className={({ isActive }) => isActive ? 'text-white font-medium text-sm' : 'text-purple-300 text-sm hover:text-white'}>Clientes</NavLink>
+            <NavLink to="/contratos" className={({ isActive }) => isActive ? 'text-white font-medium text-sm' : 'text-purple-300 text-sm hover:text-white'}>Contratos</NavLink>
+            <NavLink to="/receita" className={({ isActive }) => isActive ? 'text-white font-medium text-sm' : 'text-purple-300 text-sm hover:text-white'}>Receita</NavLink>
+            <NavLink to="/dre" className={({ isActive }) => isActive ? 'text-white font-medium text-sm' : 'text-purple-300 text-sm hover:text-white'}>DRE</NavLink>
+            <NavLink to="/fluxo-caixa" className={({ isActive }) => isActive ? 'text-white font-medium text-sm' : 'text-purple-300 text-sm hover:text-white'}>Fluxo de Caixa</NavLink>
+            <NavLink to="/despesas" className={({ isActive }) => isActive ? 'text-white font-medium text-sm' : 'text-purple-300 text-sm hover:text-white'}>Despesas</NavLink>
+          </div>
+          <button
+            onClick={() => supabase.auth.signOut()}
+            className="text-purple-300 text-sm hover:text-white"
+          >
+            Sair
+          </button>
         </div>
       </nav>
       <main className="p-6">{children}</main>
