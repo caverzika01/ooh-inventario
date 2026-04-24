@@ -22,6 +22,8 @@ export default function Despesas() {
   const [sucesso, setSucesso] = useState(false)
   const [erro, setErro] = useState('')
   const [mostrarForm, setMostrarForm] = useState(false)
+  const [editando, setEditando] = useState(null)
+  const [formEdit, setFormEdit] = useState({})
   const [form, setForm] = useState({
     categoria: '',
     data: '',
@@ -41,9 +43,7 @@ export default function Despesas() {
       .select('*')
       .order('data', { ascending: false })
 
-    if (categoriaFiltro) {
-      query = query.eq('categoria', categoriaFiltro)
-    }
+    if (categoriaFiltro) query = query.eq('categoria', categoriaFiltro)
 
     const { data } = await query
     setItens(data || [])
@@ -79,13 +79,40 @@ export default function Despesas() {
     setLoading(false)
   }
 
+  function iniciarEdicao(item) {
+    setEditando(item.id)
+    setFormEdit({
+      categoria: item.categoria,
+      data: item.data,
+      nome_item: item.nome_item,
+      fornecedor: item.fornecedor || '',
+      valor_contratado: item.valor_contratado,
+      valor_realizado: item.valor_realizado,
+    })
+  }
+
+  async function salvarEdicao(id) {
+    const { error } = await supabase.from('itens_despesa').update({
+      categoria: formEdit.categoria,
+      data: formEdit.data,
+      nome_item: formEdit.nome_item.trim(),
+      fornecedor: formEdit.fornecedor.trim() || null,
+      valor_contratado: parseFloat(formEdit.valor_contratado || 0),
+      valor_realizado: parseFloat(formEdit.valor_realizado || 0),
+    }).eq('id', id)
+
+    if (!error) {
+      setEditando(null)
+      buscarItens()
+    }
+  }
+
   async function deletar(id) {
     if (!confirm('Tem certeza que deseja excluir este item?')) return
     await supabase.from('itens_despesa').delete().eq('id', id)
     buscarItens()
   }
 
-  // Agrupar itens por categoria
   const itensPorCategoria = CATEGORIAS.reduce((acc, cat) => {
     const filtrados = itens.filter(i => i.categoria === cat)
     if (filtrados.length > 0) acc[cat] = filtrados
@@ -108,7 +135,7 @@ export default function Despesas() {
         </button>
       </div>
 
-      {/* Formulário */}
+      {/* Formulário novo item */}
       {mostrarForm && (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-sm font-medium text-gray-700 mb-4">Nova despesa</h2>
@@ -124,7 +151,6 @@ export default function Despesas() {
                 {CATEGORIAS.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
-
             <div>
               <label className="text-xs text-gray-500 mb-1 block">Data</label>
               <input
@@ -134,7 +160,6 @@ export default function Despesas() {
                 className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-400"
               />
             </div>
-
             <div>
               <label className="text-xs text-gray-500 mb-1 block">Fornecedor</label>
               <input
@@ -145,7 +170,6 @@ export default function Despesas() {
                 className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-400"
               />
             </div>
-
             <div className="col-span-2">
               <label className="text-xs text-gray-500 mb-1 block">Nome do item</label>
               <input
@@ -156,7 +180,6 @@ export default function Despesas() {
                 className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-400"
               />
             </div>
-
             <div>
               <label className="text-xs text-gray-500 mb-1 block">Valor Contratado</label>
               <div className="relative">
@@ -172,7 +195,6 @@ export default function Despesas() {
                 />
               </div>
             </div>
-
             <div>
               <label className="text-xs text-gray-500 mb-1 block">Valor Realizado</label>
               <div className="relative">
@@ -189,10 +211,8 @@ export default function Despesas() {
               </div>
             </div>
           </div>
-
           {erro && <p className="text-red-500 text-sm mt-3">{erro}</p>}
           {sucesso && <p className="text-green-600 text-sm mt-3">Salvo com sucesso!</p>}
-
           <button
             onClick={salvar}
             disabled={loading}
@@ -203,7 +223,7 @@ export default function Despesas() {
         </div>
       )}
 
-      {/* Totais gerais */}
+      {/* Totais */}
       <div className="grid grid-cols-3 gap-4">
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <p className="text-xs text-gray-400 mb-1">Total Contratado</p>
@@ -219,7 +239,7 @@ export default function Despesas() {
         </div>
       </div>
 
-      {/* Filtro por categoria */}
+      {/* Filtro */}
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <select
           value={categoriaFiltro}
@@ -231,7 +251,7 @@ export default function Despesas() {
         </select>
       </div>
 
-      {/* Itens agrupados por categoria */}
+      {/* Itens agrupados */}
       {Object.keys(itensPorCategoria).length === 0 ? (
         <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
           <p className="text-gray-400 text-sm">Nenhuma despesa lançada ainda</p>
@@ -269,24 +289,120 @@ export default function Despesas() {
                     const saldo = parseFloat(item.valor_contratado) - parseFloat(item.valor_realizado)
                     return (
                       <tr key={item.id} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                        <td className="px-6 py-3 text-gray-600">
-                          {new Date(item.data + 'T00:00:00').toLocaleDateString('pt-BR')}
-                        </td>
-                        <td className="px-6 py-3 text-gray-800 font-medium">{item.nome_item}</td>
-                        <td className="px-6 py-3 text-gray-500">{item.fornecedor || '—'}</td>
-                        <td className="px-6 py-3 text-right text-gray-700">{fmt(item.valor_contratado)}</td>
-                        <td className="px-6 py-3 text-right text-blue-600">{fmt(item.valor_realizado)}</td>
-                        <td className={`px-6 py-3 text-right font-medium ${saldo >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                          {fmt(saldo)}
-                        </td>
-                        <td className="px-6 py-3 text-right">
-                          <button
-                            onClick={() => deletar(item.id)}
-                            className="text-red-400 text-xs hover:text-red-600"
-                          >
-                            Excluir
-                          </button>
-                        </td>
+                        {editando === item.id ? (
+                          <td colSpan={7} className="px-6 py-4">
+                            <div className="grid grid-cols-3 gap-3">
+                              <div>
+                                <label className="text-xs text-gray-500 mb-1 block">Categoria</label>
+                                <select
+                                  value={formEdit.categoria}
+                                  onChange={e => setFormEdit({ ...formEdit, categoria: e.target.value })}
+                                  className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-400"
+                                >
+                                  {CATEGORIAS.map(c => <option key={c} value={c}>{c}</option>)}
+                                </select>
+                              </div>
+                              <div>
+                                <label className="text-xs text-gray-500 mb-1 block">Data</label>
+                                <input
+                                  type="date"
+                                  value={formEdit.data}
+                                  onChange={e => setFormEdit({ ...formEdit, data: e.target.value })}
+                                  className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-400"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-xs text-gray-500 mb-1 block">Fornecedor</label>
+                                <input
+                                  type="text"
+                                  value={formEdit.fornecedor}
+                                  onChange={e => setFormEdit({ ...formEdit, fornecedor: e.target.value })}
+                                  className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-400"
+                                />
+                              </div>
+                              <div className="col-span-3">
+                                <label className="text-xs text-gray-500 mb-1 block">Nome do item</label>
+                                <input
+                                  type="text"
+                                  value={formEdit.nome_item}
+                                  onChange={e => setFormEdit({ ...formEdit, nome_item: e.target.value })}
+                                  className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-400"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-xs text-gray-500 mb-1 block">Valor Contratado</label>
+                                <div className="relative">
+                                  <span className="absolute left-3 top-1.5 text-sm text-gray-400">R$</span>
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value={formEdit.valor_contratado}
+                                    onChange={e => setFormEdit({ ...formEdit, valor_contratado: e.target.value })}
+                                    className="w-full border border-gray-200 rounded-lg pl-8 pr-3 py-1.5 text-sm focus:outline-none focus:border-blue-400"
+                                  />
+                                </div>
+                              </div>
+                              <div>
+                                <label className="text-xs text-gray-500 mb-1 block">Valor Realizado</label>
+                                <div className="relative">
+                                  <span className="absolute left-3 top-1.5 text-sm text-gray-400">R$</span>
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value={formEdit.valor_realizado}
+                                    onChange={e => setFormEdit({ ...formEdit, valor_realizado: e.target.value })}
+                                    className="w-full border border-gray-200 rounded-lg pl-8 pr-3 py-1.5 text-sm focus:outline-none focus:border-blue-400"
+                                  />
+                                </div>
+                              </div>
+                              <div className="col-span-3 flex gap-3 mt-1">
+                                <button
+                                  onClick={() => salvarEdicao(item.id)}
+                                  className="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-blue-700"
+                                >
+                                  Salvar
+                                </button>
+                                <button
+                                  onClick={() => setEditando(null)}
+                                  className="text-gray-400 text-sm hover:text-gray-600"
+                                >
+                                  Cancelar
+                                </button>
+                              </div>
+                            </div>
+                          </td>
+                        ) : (
+                          <>
+                            <td className="px-6 py-3 text-gray-600">
+                              {new Date(item.data + 'T00:00:00').toLocaleDateString('pt-BR')}
+                            </td>
+                            <td className="px-6 py-3 text-gray-800 font-medium">{item.nome_item}</td>
+                            <td className="px-6 py-3 text-gray-500">{item.fornecedor || '—'}</td>
+                            <td className="px-6 py-3 text-right text-gray-700">{fmt(item.valor_contratado)}</td>
+                            <td className="px-6 py-3 text-right text-blue-600">{fmt(item.valor_realizado)}</td>
+                            <td className={`px-6 py-3 text-right font-medium ${saldo >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                              {fmt(saldo)}
+                            </td>
+                            <td className="px-6 py-3 text-right">
+                              <div className="flex items-center justify-end gap-3">
+                                <button
+                                  onClick={() => iniciarEdicao(item)}
+                                  className="text-blue-400 text-xs hover:text-blue-600"
+                                >
+                                  Editar
+                                </button>
+                                <button
+                                  onClick={() => deletar(item.id)}
+                                  className="text-red-400 text-xs hover:text-red-600"
+                                >
+                                  Excluir
+                                </button>
+                              </div>
+                            </td>
+                          </>
+                        )}
                       </tr>
                     )
                   })}

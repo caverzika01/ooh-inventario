@@ -6,6 +6,8 @@ export default function Clientes() {
   const [nome, setNome] = useState('')
   const [loading, setLoading] = useState(false)
   const [erro, setErro] = useState('')
+  const [editando, setEditando] = useState(null)
+  const [nomeEdit, setNomeEdit] = useState('')
 
   useEffect(() => {
     buscarClientes()
@@ -28,6 +30,13 @@ export default function Clientes() {
       buscarClientes()
     }
     setLoading(false)
+  }
+
+  async function salvarEdicao(id) {
+    if (!nomeEdit.trim()) return
+    await supabase.from('clientes').update({ nome: nomeEdit.trim() }).eq('id', id)
+    setEditando(null)
+    buscarClientes()
   }
 
   async function deletarCliente(id) {
@@ -72,13 +81,48 @@ export default function Clientes() {
                 key={cliente.id}
                 className={`flex items-center justify-between px-6 py-4 ${i !== clientes.length - 1 ? 'border-b border-gray-100' : ''}`}
               >
-                <span className="text-sm text-gray-800">{cliente.nome}</span>
-                <button
-                  onClick={() => deletarCliente(cliente.id)}
-                  className="text-red-400 text-sm hover:text-red-600"
-                >
-                  Excluir
-                </button>
+                {editando === cliente.id ? (
+                  <div className="flex items-center gap-3 flex-1">
+                    <input
+                      type="text"
+                      value={nomeEdit}
+                      onChange={e => setNomeEdit(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && salvarEdicao(cliente.id)}
+                      className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-400"
+                      autoFocus
+                    />
+                    <button
+                      onClick={() => salvarEdicao(cliente.id)}
+                      className="text-blue-600 text-sm font-medium hover:text-blue-800"
+                    >
+                      Salvar
+                    </button>
+                    <button
+                      onClick={() => setEditando(null)}
+                      className="text-gray-400 text-sm hover:text-gray-600"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <span className="text-sm text-gray-800">{cliente.nome}</span>
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={() => { setEditando(cliente.id); setNomeEdit(cliente.nome) }}
+                        className="text-blue-400 text-sm hover:text-blue-600"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => deletarCliente(cliente.id)}
+                        className="text-red-400 text-sm hover:text-red-600"
+                      >
+                        Excluir
+                      </button>
+                    </div>
+                  </>
+                )}
               </li>
             ))}
           </ul>

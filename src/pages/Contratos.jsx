@@ -17,6 +17,8 @@ export default function Contratos() {
   const [periodoFim, setPeriodoFim] = useState('')
   const [loading, setLoading] = useState(false)
   const [erro, setErro] = useState('')
+  const [editando, setEditando] = useState(null)
+  const [formEdit, setFormEdit] = useState({})
 
   useEffect(() => {
     buscarClientes()
@@ -64,6 +66,32 @@ export default function Contratos() {
       buscarContratos()
     }
     setLoading(false)
+  }
+
+  function iniciarEdicao(contrato) {
+    setEditando(contrato.id)
+    setFormEdit({
+      cliente_id: contrato.cliente_id,
+      descricao: contrato.descricao || '',
+      aliquota_imposto: (contrato.aliquota_imposto * 100).toFixed(0),
+      periodo_inicio: contrato.periodo_inicio,
+      periodo_fim: contrato.periodo_fim,
+    })
+  }
+
+  async function salvarEdicao(id) {
+    const { error } = await supabase.from('contratos').update({
+      cliente_id: formEdit.cliente_id,
+      descricao: formEdit.descricao || null,
+      aliquota_imposto: parseFloat(formEdit.aliquota_imposto) / 100,
+      periodo_inicio: formEdit.periodo_inicio,
+      periodo_fim: formEdit.periodo_fim,
+    }).eq('id', id)
+
+    if (!error) {
+      setEditando(null)
+      buscarContratos()
+    }
   }
 
   async function deletarContrato(id) {
@@ -117,9 +145,7 @@ export default function Contratos() {
             />
           </div>
 
-          <div>
-            <label className="text-xs text-gray-500 mb-1 block"> </label>
-          </div>
+          <div></div>
 
           <div>
             <label className="text-xs text-gray-500 mb-1 block">Período início</label>
@@ -165,22 +191,100 @@ export default function Contratos() {
             {contratos.map((contrato, i) => (
               <li
                 key={contrato.id}
-                className={`flex items-center justify-between px-6 py-4 ${i !== contratos.length - 1 ? 'border-b border-gray-100' : ''}`}
+                className={`px-6 py-4 ${i !== contratos.length - 1 ? 'border-b border-gray-100' : ''}`}
               >
-                <div>
-                  <p className="text-sm font-medium text-gray-800">{contrato.clientes?.nome}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    {contrato.descricao && `${contrato.descricao} · `}
-                    {contrato.periodo_inicio} até {contrato.periodo_fim} · 
-                    Alíquota: {(contrato.aliquota_imposto * 100).toFixed(0)}%
-                  </p>
-                </div>
-                <button
-                  onClick={() => deletarContrato(contrato.id)}
-                  className="text-red-400 text-sm hover:text-red-600"
-                >
-                  Excluir
-                </button>
+                {editando === contrato.id ? (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="col-span-2">
+                      <label className="text-xs text-gray-500 mb-1 block">Cliente</label>
+                      <select
+                        value={formEdit.cliente_id}
+                        onChange={e => setFormEdit({ ...formEdit, cliente_id: e.target.value })}
+                        className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-400"
+                      >
+                        {clientes.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+                      </select>
+                    </div>
+                    <div className="col-span-2">
+                      <label className="text-xs text-gray-500 mb-1 block">Descrição</label>
+                      <input
+                        type="text"
+                        value={formEdit.descricao}
+                        onChange={e => setFormEdit({ ...formEdit, descricao: e.target.value })}
+                        className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-500 mb-1 block">Alíquota (%)</label>
+                      <input
+                        type="number"
+                        value={formEdit.aliquota_imposto}
+                        onChange={e => setFormEdit({ ...formEdit, aliquota_imposto: e.target.value })}
+                        className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-400"
+                      />
+                    </div>
+                    <div></div>
+                    <div>
+                      <label className="text-xs text-gray-500 mb-1 block">Período início</label>
+                      <select
+                        value={formEdit.periodo_inicio}
+                        onChange={e => setFormEdit({ ...formEdit, periodo_inicio: e.target.value })}
+                        className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-400"
+                      >
+                        {PERIODOS.map(p => <option key={p} value={p}>{p}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-500 mb-1 block">Período fim</label>
+                      <select
+                        value={formEdit.periodo_fim}
+                        onChange={e => setFormEdit({ ...formEdit, periodo_fim: e.target.value })}
+                        className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-400"
+                      >
+                        {PERIODOS.map(p => <option key={p} value={p}>{p}</option>)}
+                      </select>
+                    </div>
+                    <div className="col-span-2 flex gap-3 mt-1">
+                      <button
+                        onClick={() => salvarEdicao(contrato.id)}
+                        className="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-blue-700"
+                      >
+                        Salvar
+                      </button>
+                      <button
+                        onClick={() => setEditando(null)}
+                        className="text-gray-400 text-sm hover:text-gray-600"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-800">{contrato.clientes?.nome}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {contrato.descricao && `${contrato.descricao} · `}
+                        {contrato.periodo_inicio} até {contrato.periodo_fim} ·
+                        Alíquota: {(contrato.aliquota_imposto * 100).toFixed(0)}%
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={() => iniciarEdicao(contrato)}
+                        className="text-blue-400 text-sm hover:text-blue-600"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => deletarContrato(contrato.id)}
+                        className="text-red-400 text-sm hover:text-red-600"
+                      >
+                        Excluir
+                      </button>
+                    </div>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
