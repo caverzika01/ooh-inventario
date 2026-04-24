@@ -5,6 +5,7 @@ import Receita from './pages/Receita'
 import DRE from './pages/DRE'
 import Dashboard from './pages/Dashboard'
 import FluxoCaixa from './pages/FluxoCaixa'
+import Despesas from './pages/Despesas'
 
 function Layout({ children }) {
   return (
@@ -18,6 +19,7 @@ function Layout({ children }) {
           <NavLink to="/receita" className={({ isActive }) => isActive ? 'text-blue-600 font-medium text-sm' : 'text-gray-500 text-sm hover:text-gray-800'}>Receita</NavLink>
           <NavLink to="/dre" className={({ isActive }) => isActive ? 'text-blue-600 font-medium text-sm' : 'text-gray-500 text-sm hover:text-gray-800'}>DRE</NavLink>
           <NavLink to="/fluxo-caixa" className={({ isActive }) => isActive ? 'text-blue-600 font-medium text-sm' : 'text-gray-500 text-sm hover:text-gray-800'}>Fluxo de Caixa</NavLink>
+          <NavLink to="/despesas" className={({ isActive }) => isActive ? 'text-blue-600 font-medium text-sm' : 'text-gray-500 text-sm hover:text-gray-800'}>Despesas</NavLink>
         </div>
       </nav>
       <main className="p-6">{children}</main>
@@ -38,6 +40,7 @@ export default function AppRoutes() {
               <Route path="/receita" element={<Receita />} />
               <Route path="/dre" element={<DRE />} />
               <Route path="/fluxo-caixa" element={<FluxoCaixa />} />
+              <Route path="/despesas" element={<Despesas />} />
             </Routes>
           </Layout>
         } />
