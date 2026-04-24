@@ -6,6 +6,7 @@ import DRE from './pages/DRE'
 import Dashboard from './pages/Dashboard'
 import FluxoCaixa from './pages/FluxoCaixa'
 import Despesas from './pages/Despesas'
+import { supabase } from './lib/supabase'
 
 function Layout({ children }) {
   return (
@@ -13,6 +14,14 @@ function Layout({ children }) {
       <nav className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center gap-8">
           <span className="font-semibold text-gray-800">OOH Inventário</span>
+            <div className="ml-auto">
+              <button
+                onClick={() => supabase.auth.signOut()}
+                className="text-gray-400 text-sm hover:text-gray-600"
+              >
+                Sair
+              </button>
+</div>
           <NavLink to="/" className={({ isActive }) => isActive ? 'text-blue-600 font-medium text-sm' : 'text-gray-500 text-sm hover:text-gray-800'}>Dashboard</NavLink>
           <NavLink to="/clientes" className={({ isActive }) => isActive ? 'text-blue-600 font-medium text-sm' : 'text-gray-500 text-sm hover:text-gray-800'}>Clientes</NavLink>
           <NavLink to="/contratos" className={({ isActive }) => isActive ? 'text-blue-600 font-medium text-sm' : 'text-gray-500 text-sm hover:text-gray-800'}>Contratos</NavLink>
