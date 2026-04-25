@@ -41,7 +41,6 @@ export default function Dashboard() {
 
     const dadosPorPeriodo = PERIODOS.map(periodo => {
 
-      
       const dreperiodo = dre?.find(d => d.periodo === periodo) || {}
 
       const contratosAtivos = (contratos || []).filter(c => {
@@ -63,14 +62,12 @@ export default function Dashboard() {
           tributos += parseFloat(r.valor || 0) * parseFloat(contrato?.aliquota_imposto || 0)
         })
 
-      // Calcular comissões e bonificações
       const gratificacoes = parseFloat(dreperiodo.gratificacoes || 0)
       const bonusVeiculacao = parseFloat(dreperiodo.bonus_veiculacao || 0)
       const comissaoVendedor = parseFloat(dreperiodo.comissao_vendedor || 0)
       const outorga = parseFloat(dreperiodo.outorga || 0)
       const totalComissoes = gratificacoes + bonusVeiculacao + comissaoVendedor
 
-      // Calcular custos
       const totalCustos =
         parseFloat(dreperiodo.custo_prestacao_mo || 0) +
         parseFloat(dreperiodo.materiais_insumos || 0) +
@@ -81,7 +78,6 @@ export default function Dashboard() {
         parseFloat(dreperiodo.subgrupo_extras || 0) +
         parseFloat(dreperiodo.servicos_publicos || 0)
 
-      // Calcular receita líquida e lucro líquido
       const receitaLiqAntesBonif = receitaBruta - tributos
       const receitaLiquida = receitaLiqAntesBonif - totalComissoes - outorga
       const lucroLiquido = receitaLiquida - totalCustos
@@ -118,7 +114,6 @@ export default function Dashboard() {
     <div className="max-w-5xl mx-auto space-y-6">
       <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
 
-      {/* Cards de totais */}
       <div className="grid grid-cols-4 gap-4">
         {[
           { label: 'Receita Bruta Total', value: fmt(totais.receitaBruta), color: 'text-gray-800' },
@@ -133,7 +128,6 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Melhor período */}
       {melhorPeriodo && melhorPeriodo.lucroLiquido > 0 && (
         <div className="bg-green-50 border border-green-100 rounded-lg px-6 py-4">
           <p className="text-sm text-green-700">
@@ -142,7 +136,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Gráfico de receita e lucro */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <h2 className="text-sm font-medium text-gray-700 mb-6">Receita Bruta × Receita Líquida × Lucro Líquido</h2>
         <ResponsiveContainer width="100%" height={280}>
@@ -159,7 +152,6 @@ export default function Dashboard() {
         </ResponsiveContainer>
       </div>
 
-      {/* Gráfico de custos */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <h2 className="text-sm font-medium text-gray-700 mb-6">Custos Operacionais por Período</h2>
         <ResponsiveContainer width="100%" height={280}>
@@ -175,7 +167,6 @@ export default function Dashboard() {
         </ResponsiveContainer>
       </div>
 
-      {/* Tabela resumo */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100">
           <h2 className="text-sm font-medium text-gray-700">Resumo por período</h2>

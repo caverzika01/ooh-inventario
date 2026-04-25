@@ -135,7 +135,6 @@ export default function Despesas() {
         </button>
       </div>
 
-      {/* Formulário novo item */}
       {mostrarForm && (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-sm font-medium text-gray-700 mb-4">Nova despesa</h2>
@@ -223,7 +222,6 @@ export default function Despesas() {
         </div>
       )}
 
-      {/* Totais */}
       <div className="grid grid-cols-3 gap-4">
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <p className="text-xs text-gray-400 mb-1">Total Contratado</p>
@@ -239,7 +237,6 @@ export default function Despesas() {
         </div>
       </div>
 
-      {/* Filtro */}
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <select
           value={categoriaFiltro}
@@ -251,7 +248,6 @@ export default function Despesas() {
         </select>
       </div>
 
-      {/* Itens agrupados */}
       {Object.keys(itensPorCategoria).length === 0 ? (
         <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
           <p className="text-gray-400 text-sm">Nenhuma despesa lançada ainda</p>

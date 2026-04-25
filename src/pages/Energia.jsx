@@ -163,7 +163,6 @@ export default function Energia() {
         </button>
       </div>
 
-      {/* Formulário nova instalação */}
       {mostrarForm && (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-sm font-medium text-gray-700 mb-4">Nova instalação</h2>
@@ -206,7 +205,6 @@ export default function Energia() {
         </div>
       )}
 
-      {/* Modal de valores mensais */}
       {valoresEditando && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg border border-gray-200 p-6 w-full max-w-lg">
@@ -242,7 +240,6 @@ export default function Energia() {
         </div>
       )}
 
-      {/* Filtros */}
       <div className="bg-white rounded-lg border border-gray-200 p-4 flex gap-4">
         <div className="flex-1">
           <label className="text-xs text-gray-500 mb-1 block">Ano</label>

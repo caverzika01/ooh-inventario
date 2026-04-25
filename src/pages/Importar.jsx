@@ -41,7 +41,6 @@ export default function Importar() {
       complete: async (result) => {
         const linhas = result.data
 
-        // Pegar somente linhas 5 até 229 (índices 4 até 228)
         const dados = linhas.slice(4, 229).filter(linha => {
           const nome = linha[0]?.trim()
           return nome && nome !== ''
@@ -56,16 +55,13 @@ export default function Importar() {
           const nomeCliente = linha[0]?.trim()
           if (!nomeCliente) continue
 
-          // Alíquota na coluna S (índice 18)
           const aliquota = parseAliquota(linha[18])
 
-          // Valores nas colunas C até Q (índices 2 até 16)
           const valoresPeriodos = PERIODOS.map((periodo, i) => ({
             periodo,
             valor: parseValor(linha[2 + i])
           }))
 
-          // Determinar período início e fim
           const periodosComValor = valoresPeriodos.filter(v => v.valor > 0)
           if (periodosComValor.length === 0) {
             adicionarLog(`Ignorado (sem valores): ${nomeCliente}`, 'aviso')
@@ -76,7 +72,6 @@ export default function Importar() {
           const periodoFim = periodosComValor[periodosComValor.length - 1].periodo
 
           try {
-            // Buscar ou criar cliente
             let clienteId = null
             const { data: clienteExistente } = await supabase
               .from('clientes')
@@ -102,7 +97,6 @@ export default function Importar() {
               adicionarLog(`Cliente criado: ${nomeCliente}`, 'sucesso')
             }
 
-            // Criar contrato
             const { data: novoContrato, error: errContrato } = await supabase
               .from('contratos')
               .insert({
@@ -120,7 +114,6 @@ export default function Importar() {
               continue
             }
 
-            // Inserir receita bruta por período
             const receitas = periodosComValor.map(v => ({
               contrato_id: novoContrato.id,
               periodo: v.periodo,
@@ -386,7 +379,6 @@ async function importarDespesas(e) {
         if (!str || str.trim() === '') return null
         const s = str.trim()
 
-        // Formato dd/mm/yy ou dd/mm/yyyy
         const match1 = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/)
         if (match1) {
           let ano = parseInt(match1[3])
@@ -396,7 +388,6 @@ async function importarDespesas(e) {
           return `${ano}-${mes}-${dia}`
         }
 
-        // Formato "dez.-15", "jun.-24" etc
         const MESES_PT = {
           'jan': '01', 'fev': '02', 'mar': '03', 'abr': '04',
           'mai': '05', 'jun': '06', 'jul': '07', 'ago': '08',
@@ -410,7 +401,6 @@ async function importarDespesas(e) {
           if (mes) return `${ano}-${mes}-01`
         }
 
-        // Formato "ANO 1", "ANO 2" etc - usar data generica
         if (s.match(/^ANO\s+\d+$/i)) return '2015-01-01'
 
         return null
@@ -488,10 +478,8 @@ async function importarEnergia(e) {
       const linhas = result.data
       const cabecalho = linhas[1] || []
 
-      // Detectar se tem coluna MEDIDOR
       const temMedidor = cabecalho.includes('MEDIDOR')
 
-      // Ajustar índices baseado na presença do medidor
       const idxTitular = 1
       const idxCodigo = 2
       const idxMedidor = temMedidor ? 3 : null
@@ -500,7 +488,6 @@ async function importarEnergia(e) {
       const idxMeses = temMedidor ? 6 : 5
       const idxObs = temMedidor ? 18 : 17
 
-      // Detectar ano pelo cabeçalho
       const anoMatch = cabecalho[idxMeses]?.match(/(\d{2})$/)
       const ano = anoMatch ? parseInt('20' + anoMatch[1]) : null
 

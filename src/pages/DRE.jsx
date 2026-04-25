@@ -38,7 +38,6 @@ export default function DRE() {
     setLoading(true)
     setSucesso(false)
 
-    // Buscar receita bruta e tributos calculados automaticamente
     const { data: contratos } = await supabase
       .from('contratos')
       .select('id, aliquota_imposto, periodo_inicio, periodo_fim')
@@ -72,7 +71,6 @@ export default function DRE() {
     setReceitaBruta(totalBruto)
     setTributos(totalTributos)
 
-    // Buscar valores manuais já salvos
     const { data: dreData } = await supabase
       .from('dre_periodos')
       .select('*')
@@ -103,7 +101,6 @@ export default function DRE() {
       payload[c.key] = parseFloat(dre[c.key] || 0)
     })
 
-    // Calcular automaticamente
     const receitaLiqAntesBonif = receitaBruta - tributos
     const totalComissoes = parseFloat(dre.gratificacoes || 0) + parseFloat(dre.bonus_veiculacao || 0) + parseFloat(dre.comissao_vendedor || 0)
     const receitaLiquida = receitaLiqAntesBonif - totalComissoes - parseFloat(dre.outorga || 0)
@@ -154,7 +151,6 @@ export default function DRE() {
       {periodo && !loading && (
         <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
 
-          {/* Calculados automaticamente */}
           <div>
             <h2 className="text-xs font-medium text-gray-400 uppercase mb-3">Calculado automaticamente</h2>
             <div className="space-y-2">
@@ -173,7 +169,6 @@ export default function DRE() {
             </div>
           </div>
 
-          {/* Comissões e bonificações */}
           <div>
             <h2 className="text-xs font-medium text-gray-400 uppercase mb-3">Comissões e Bonificações</h2>
             <div className="space-y-2">
@@ -203,7 +198,6 @@ export default function DRE() {
             </div>
           </div>
 
-          {/* Custos administrativos */}
           <div>
             <h2 className="text-xs font-medium text-gray-400 uppercase mb-3">Custos Administrativos e Operacionais</h2>
             <div className="space-y-2">
@@ -227,7 +221,6 @@ export default function DRE() {
             </div>
           </div>
 
-          {/* Resultado final */}
           <div className="border-t border-gray-200 pt-4 space-y-2">
             <div className="flex justify-between">
               <span className="text-sm text-gray-600">Total Custos</span>

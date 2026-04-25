@@ -99,7 +99,6 @@ export default function FluxoCaixa() {
     const payload = { periodo }
     ATIVOS.forEach(a => { payload[a.key] = parseFloat(valores[a.key] || 0) })
 
-    // Buscar lucro líquido do período para calcular fluxo livre
     const { data: dre } = await supabase
       .from('dre_periodos')
       .select('lucro_liquido')
@@ -110,7 +109,6 @@ export default function FluxoCaixa() {
     const totalInvestimento = ATIVOS.reduce((acc, a) => acc + parseFloat(valores[a.key] || 0), 0)
     const fluxoCaixaLivre = lucroLiquido - totalInvestimento
 
-    // Calcular fluxo acumulado
     const indicePeriodo = PERIODOS.indexOf(periodo)
     let acumulado = fluxoCaixaLivre
 
@@ -143,7 +141,6 @@ export default function FluxoCaixa() {
     <div className="max-w-4xl mx-auto space-y-6">
       <h1 className="text-2xl font-semibold text-gray-800">Fluxo de Caixa</h1>
 
-      {/* Lançamento por período */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <h2 className="text-sm font-medium text-gray-700 mb-4">Lançar investimentos por período</h2>
         <select
@@ -199,7 +196,6 @@ export default function FluxoCaixa() {
         )}
       </div>
 
-      {/* Gráfico investimentos */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <h2 className="text-sm font-medium text-gray-700 mb-6">Investimentos em Mobiliário por Período</h2>
         <ResponsiveContainer width="100%" height={240}>
@@ -214,7 +210,6 @@ export default function FluxoCaixa() {
         </ResponsiveContainer>
       </div>
 
-      {/* Gráfico fluxo acumulado */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <h2 className="text-sm font-medium text-gray-700 mb-6">Fluxo de Caixa Livre × Acumulado</h2>
         <ResponsiveContainer width="100%" height={260}>
