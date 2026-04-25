@@ -143,37 +143,6 @@ export default function FluxoCaixa() {
     <div className="max-w-4xl mx-auto space-y-6">
       <h1 className="text-2xl font-semibold text-gray-800">Fluxo de Caixa</h1>
 
-      {/* Gráfico fluxo acumulado */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-sm font-medium text-gray-700 mb-6">Fluxo de Caixa Livre × Acumulado</h2>
-        <ResponsiveContainer width="100%" height={260}>
-          <LineChart data={dadosGrafico} margin={{ top: 4, right: 16, left: 16, bottom: 4 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis dataKey="periodo" tick={{ fontSize: 11 }} />
-            <YAxis tickFormatter={fmtShort} tick={{ fontSize: 11 }} />
-            <Tooltip formatter={v => fmt(v)} />
-            <Legend wrapperStyle={{ fontSize: 12 }} />
-            <Line type="monotone" dataKey="fluxoCaixaLivre" name="Fluxo Livre" stroke="#3b82f6" strokeWidth={2} dot={false} />
-            <Line type="monotone" dataKey="fluxoCaixaAcumulado" name="Fluxo Acumulado" stroke="#10b981" strokeWidth={2} dot={false} />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Gráfico investimentos */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-sm font-medium text-gray-700 mb-6">Investimentos em Mobiliário por Período</h2>
-        <ResponsiveContainer width="100%" height={240}>
-          <BarChart data={dadosGrafico} margin={{ top: 4, right: 16, left: 16, bottom: 4 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis dataKey="periodo" tick={{ fontSize: 11 }} />
-            <YAxis tickFormatter={fmtShort} tick={{ fontSize: 11 }} />
-            <Tooltip formatter={v => fmt(v)} />
-            <Legend wrapperStyle={{ fontSize: 12 }} />
-            <Bar dataKey="investimento" name="Investimento" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
       {/* Lançamento por período */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <h2 className="text-sm font-medium text-gray-700 mb-4">Lançar investimentos por período</h2>
@@ -228,6 +197,37 @@ export default function FluxoCaixa() {
             )}
           </>
         )}
+      </div>
+
+      {/* Gráfico investimentos */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h2 className="text-sm font-medium text-gray-700 mb-6">Investimentos em Mobiliário por Período</h2>
+        <ResponsiveContainer width="100%" height={240}>
+          <BarChart data={dadosGrafico} margin={{ top: 4, right: 16, left: 16, bottom: 4 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <XAxis dataKey="periodo" tick={{ fontSize: 11 }} />
+            <YAxis tickFormatter={fmtShort} tick={{ fontSize: 11 }} />
+            <Tooltip formatter={v => fmt(v)} />
+            <Legend wrapperStyle={{ fontSize: 12 }} />
+            <Bar dataKey="investimento" name="Investimento" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Gráfico fluxo acumulado */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h2 className="text-sm font-medium text-gray-700 mb-6">Fluxo de Caixa Livre × Acumulado</h2>
+        <ResponsiveContainer width="100%" height={260}>
+          <LineChart data={dadosGrafico} margin={{ top: 4, right: 16, left: 16, bottom: 4 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <XAxis dataKey="periodo" tick={{ fontSize: 11 }} />
+            <YAxis tickFormatter={fmtShort} tick={{ fontSize: 11 }} />
+            <Tooltip formatter={v => fmt(v)} />
+            <Legend wrapperStyle={{ fontSize: 12 }} />
+            <Line type="monotone" dataKey="fluxoCaixaLivre" name="Fluxo Livre" stroke="#3b82f6" strokeWidth={2} dot={false} />
+            <Line type="monotone" dataKey="fluxoCaixaAcumulado" name="Fluxo Acumulado" stroke="#10b981" strokeWidth={2} dot={false} />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
     </div>
   )

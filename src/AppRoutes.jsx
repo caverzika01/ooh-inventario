@@ -8,6 +8,7 @@ import FluxoCaixa from './pages/FluxoCaixa'
 import Despesas from './pages/Despesas'
 import { supabase } from './lib/supabase'
 import Energia from './pages/Energia'
+import Importar from './pages/Importar'
 
 function Layout({ children }) {
   return (
@@ -24,6 +25,7 @@ function Layout({ children }) {
             <NavLink to="/fluxo-caixa" className={({ isActive }) => isActive ? 'text-white font-medium text-sm' : 'text-purple-300 text-sm hover:text-white'}>Fluxo de Caixa</NavLink>
             <NavLink to="/despesas" className={({ isActive }) => isActive ? 'text-white font-medium text-sm' : 'text-purple-300 text-sm hover:text-white'}>Despesas</NavLink>
             <NavLink to="/energia" className={({ isActive }) => isActive ? 'text-white font-medium text-sm' : 'text-purple-300 text-sm hover:text-white'}>Energia</NavLink>
+            <NavLink to="/importar" className={({ isActive }) => isActive ? 'text-white font-medium text-sm' : 'text-purple-300 text-sm hover:text-white'}>Importar</NavLink>
           </div>
           <button
             onClick={() => supabase.auth.signOut()}
@@ -53,6 +55,7 @@ export default function AppRoutes() {
               <Route path="/fluxo-caixa" element={<FluxoCaixa />} />
               <Route path="/despesas" element={<Despesas />} />
               <Route path="/energia" element={<Energia />} />
+              <Route path="/importar" element={<Importar />} />
             </Routes>
           </Layout>
         } />

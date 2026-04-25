@@ -6,7 +6,7 @@ const MESES = [
   'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
 ]
 
-const ANOS = Array.from({ length: 13 }, (_, i) => 2018 + i)
+const ANOS = Array.from({ length: 16 }, (_, i) => 2015 + i)
 const fmt = v => Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
 export default function Energia() {
@@ -283,6 +283,7 @@ export default function Energia() {
                 <tr className="border-b border-gray-100 bg-gray-50">
                   <th className="text-left px-4 py-2 text-xs text-gray-400 font-medium">Titular</th>
                   <th className="text-left px-4 py-2 text-xs text-gray-400 font-medium">Código</th>
+                  <th className="text-left px-4 py-2 text-xs text-gray-400 font-medium">Medidor</th>
                   <th className="text-left px-4 py-2 text-xs text-gray-400 font-medium">Local</th>
                   {MESES.map(m => <th key={m} className="text-right px-3 py-2 text-xs text-gray-400 font-medium">{m}</th>)}
                   <th className="text-right px-4 py-2 text-xs text-gray-400 font-medium">Total</th>
@@ -303,6 +304,11 @@ export default function Energia() {
                           <div>
                             <label className="text-xs text-gray-500 mb-1 block">Código</label>
                             <input type="text" value={formEdit.codigo} onChange={e => setFormEdit({ ...formEdit, codigo: e.target.value })}
+                              className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-400" />
+                          </div>
+                          <div>
+                            <label className="text-xs text-gray-500 mb-1 block">Medidor</label>
+                            <input type="text" value={formEdit.medidor || ''} onChange={e => setFormEdit({ ...formEdit, medidor: e.target.value })}
                               className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-400" />
                           </div>
                           <div>
@@ -334,7 +340,8 @@ export default function Energia() {
                       <>
                         <td className="px-4 py-3 text-gray-800 font-medium whitespace-nowrap">{inst.titular}</td>
                         <td className="px-4 py-3 text-gray-600 whitespace-nowrap">{inst.codigo}</td>
-                        <td className="px-4 py-3 text-gray-500 max-w-xs truncate">{inst.local_instalacao}</td>
+                        <td className="px-4 py-3 text-gray-600 whitespace-nowrap">{inst.medidor || '—'}</td>
+                        <td className="px-4 py-3 text-gray-500 max-w-[150px] truncate" title={inst.local_instalacao}>{inst.local_instalacao}</td>
                         {MESES.map((_, i) => (
                           <td key={i} className="px-3 py-3 text-right text-gray-600 whitespace-nowrap text-xs">
                             {getValor(inst.id, i + 1) > 0 ? fmt(getValor(inst.id, i + 1)) : '—'}
@@ -346,13 +353,13 @@ export default function Energia() {
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2 justify-end">
                             <button onClick={() => abrirValores(inst)}
-                                className="text-green-500 text-xs hover:text-green-700 whitespace-nowrap">Valores</button>
-                                <button onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(inst.local_instalacao)}`, '_blank')}
-                                className="text-purple-400 text-xs hover:text-purple-600 whitespace-nowrap">Maps</button>
-                                <button onClick={() => { setEditando(inst.id); setFormEdit({ titular: inst.titular, codigo: inst.codigo, local_instalacao: inst.local_instalacao || '', status: inst.status, observacao: inst.observacao || '' }) }}
-                                className="text-blue-400 text-xs hover:text-blue-600">Editar</button>
-                                <button onClick={() => deletar(inst.id)}
-                                className="text-red-400 text-xs hover:text-red-600">Excluir</button>
+                              className="text-green-500 text-xs hover:text-green-700 whitespace-nowrap">Valores</button>
+                            <button onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(inst.local_instalacao)}`, '_blank')}
+                              className="text-purple-400 text-xs hover:text-purple-600 whitespace-nowrap">Maps</button>
+                            <button onClick={() => { setEditando(inst.id); setFormEdit({ titular: inst.titular, codigo: inst.codigo, medidor: inst.medidor || '', local_instalacao: inst.local_instalacao || '', status: inst.status, observacao: inst.observacao || '' }) }}
+                              className="text-blue-400 text-xs hover:text-blue-600">Editar</button>
+                            <button onClick={() => deletar(inst.id)}
+                              className="text-red-400 text-xs hover:text-red-600">Excluir</button>
                           </div>
                         </td>
                       </>
@@ -387,6 +394,7 @@ export default function Energia() {
                 <tr className="border-b border-gray-100 bg-gray-50">
                   <th className="text-left px-4 py-2 text-xs text-gray-400 font-medium">Titular</th>
                   <th className="text-left px-4 py-2 text-xs text-gray-400 font-medium">Código</th>
+                  <th className="text-left px-4 py-2 text-xs text-gray-400 font-medium">Medidor</th>
                   <th className="text-left px-4 py-2 text-xs text-gray-400 font-medium">Local</th>
                   <th className="text-left px-4 py-2 text-xs text-gray-400 font-medium">Observação</th>
                   <th className="px-4 py-2"></th>
@@ -406,6 +414,11 @@ export default function Energia() {
                           <div>
                             <label className="text-xs text-gray-500 mb-1 block">Código</label>
                             <input type="text" value={formEdit.codigo} onChange={e => setFormEdit({ ...formEdit, codigo: e.target.value })}
+                              className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-400" />
+                          </div>
+                          <div>
+                            <label className="text-xs text-gray-500 mb-1 block">Medidor</label>
+                            <input type="text" value={formEdit.medidor || ''} onChange={e => setFormEdit({ ...formEdit, medidor: e.target.value })}
                               className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-400" />
                           </div>
                           <div>
@@ -437,7 +450,8 @@ export default function Energia() {
                       <>
                         <td className="px-4 py-3 text-gray-800 font-medium">{inst.titular}</td>
                         <td className="px-4 py-3 text-gray-600">{inst.codigo}</td>
-                        <td className="px-4 py-3 text-gray-500 max-w-xs truncate">{inst.local_instalacao}</td>
+                        <td className="px-4 py-3 text-gray-600">{inst.medidor || '—'}</td>
+                        <td className="px-4 py-3 text-gray-500 max-w-[150px] truncate" title={inst.local_instalacao}>{inst.local_instalacao}</td>
                         <td className="px-4 py-3 text-gray-400 text-xs">{inst.observacao || '—'}</td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2 justify-end">
