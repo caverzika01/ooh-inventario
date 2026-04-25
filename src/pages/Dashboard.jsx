@@ -26,13 +26,11 @@ export default function Dashboard() {
   async function carregarDados() {
     setLoading(true)
 
-    // Buscar DRE de todos os períodos
     const { data: dre } = await supabase
       .from('dre_periodos')
       .select('*')
       .order('periodo')
 
-    // Buscar receita bruta total por período
     const { data: contratos } = await supabase
       .from('contratos')
       .select('id, aliquota_imposto, periodo_inicio, periodo_fim')
@@ -41,11 +39,11 @@ export default function Dashboard() {
       .from('receita_bruta')
       .select('contrato_id, periodo, valor')
 
-    // Montar dados por período
     const dadosPorPeriodo = PERIODOS.map(periodo => {
+
+      
       const dreperiodo = dre?.find(d => d.periodo === periodo) || {}
 
-      // Calcular receita bruta do período somando contratos ativos
       const contratosAtivos = (contratos || []).filter(c => {
         const inicio = PERIODOS.indexOf(c.periodo_inicio)
         const fim = PERIODOS.indexOf(c.periodo_fim)
@@ -65,27 +63,41 @@ export default function Dashboard() {
           tributos += parseFloat(r.valor || 0) * parseFloat(contrato?.aliquota_imposto || 0)
         })
 
+      // Calcular comissões e bonificações
+      const gratificacoes = parseFloat(dreperiodo.gratificacoes || 0)
+      const bonusVeiculacao = parseFloat(dreperiodo.bonus_veiculacao || 0)
+      const comissaoVendedor = parseFloat(dreperiodo.comissao_vendedor || 0)
+      const outorga = parseFloat(dreperiodo.outorga || 0)
+      const totalComissoes = gratificacoes + bonusVeiculacao + comissaoVendedor
+
+      // Calcular custos
+      const totalCustos =
+        parseFloat(dreperiodo.custo_prestacao_mo || 0) +
+        parseFloat(dreperiodo.materiais_insumos || 0) +
+        parseFloat(dreperiodo.prestacao_servicos || 0) +
+        parseFloat(dreperiodo.comunicacao_visual || 0) +
+        parseFloat(dreperiodo.transporte || 0) +
+        parseFloat(dreperiodo.reembolso_despesas || 0) +
+        parseFloat(dreperiodo.subgrupo_extras || 0) +
+        parseFloat(dreperiodo.servicos_publicos || 0)
+
+      // Calcular receita líquida e lucro líquido
+      const receitaLiqAntesBonif = receitaBruta - tributos
+      const receitaLiquida = receitaLiqAntesBonif - totalComissoes - outorga
+      const lucroLiquido = receitaLiquida - totalCustos
+
       return {
         periodo,
         receitaBruta,
         tributos,
-        receitaLiquida: parseFloat(dreperiodo.receita_liquida || 0),
-        lucroLiquido: parseFloat(dreperiodo.lucro_liquido || 0),
-        totalCustos:
-          parseFloat(dreperiodo.custo_prestacao_mo || 0) +
-          parseFloat(dreperiodo.materiais_insumos || 0) +
-          parseFloat(dreperiodo.prestacao_servicos || 0) +
-          parseFloat(dreperiodo.comunicacao_visual || 0) +
-          parseFloat(dreperiodo.transporte || 0) +
-          parseFloat(dreperiodo.reembolso_despesas || 0) +
-          parseFloat(dreperiodo.subgrupo_extras || 0) +
-          parseFloat(dreperiodo.servicos_publicos || 0),
+        receitaLiquida,
+        lucroLiquido,
+        totalCustos,
       }
     })
 
     setDados(dadosPorPeriodo)
 
-    // Calcular totais gerais
     const { count } = await supabase
       .from('contratos')
       .select('*', { count: 'exact', head: true })
@@ -99,12 +111,6 @@ export default function Dashboard() {
 
     setLoading(false)
   }
-
-  if (loading) return (
-    <div className="flex items-center justify-center h-64">
-      <p className="text-sm text-gray-400">Carregando dashboard...</p>
-    </div>
-  )
 
   const melhorPeriodo = dados.reduce((a, b) => b.lucroLiquido > a.lucroLiquido ? b : a, dados[0])
 
