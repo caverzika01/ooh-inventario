@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis,
-  CartesianGrid, Tooltip, Legend, ResponsiveContainer
+  CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine
 } from 'recharts'
 
 const PERIODOS = [
@@ -92,7 +92,10 @@ export default function Dashboard() {
       }
     })
 
-    setDados(dadosPorPeriodo)
+    const dadosComMovimento = dadosPorPeriodo.filter(d =>
+      d.receitaBruta !== 0 || d.receitaLiquida !== 0 || d.lucroLiquido !== 0 || d.totalCustos !== 0
+    )
+    setDados(dadosComMovimento)
 
     const { count } = await supabase
       .from('contratos')
@@ -136,21 +139,54 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-sm font-medium text-gray-700 mb-6">Receita Bruta × Receita Líquida × Lucro Líquido</h2>
-        <ResponsiveContainer width="100%" height={280}>
-          <LineChart data={dados} margin={{ top: 4, right: 16, left: 16, bottom: 4 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis dataKey="periodo" tick={{ fontSize: 11 }} />
-            <YAxis tickFormatter={fmtShort} tick={{ fontSize: 11 }} />
-            <Tooltip formatter={v => fmt(v)} />
-            <Legend wrapperStyle={{ fontSize: 12 }} />
-            <Line type="monotone" dataKey="receitaBruta" name="Receita Bruta" stroke="#3b82f6" strokeWidth={2} dot={false} />
-            <Line type="monotone" dataKey="receitaLiquida" name="Receita Líquida" stroke="#8b5cf6" strokeWidth={2} dot={false} />
-            <Line type="monotone" dataKey="lucroLiquido" name="Lucro Líquido" stroke="#10b981" strokeWidth={2} dot={false} />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-sm font-medium text-gray-700 mb-6">Receita Bruta × Receita Líquida × Lucro Líquido</h2>
+          <ResponsiveContainer width="100%" height={280}>
+            <LineChart data={dados} margin={{ top: 4, right: 16, left: 16, bottom: 4 }}>
+              <defs>
+                {['receitaBruta', 'receitaLiquida', 'lucroLiquido'].map(key => {
+                  const valores = dados.map(d => d[key])
+                  const min = Math.min(...valores, 0)
+                  const max = Math.max(...valores, 0)
+                  const range = max - min || 1
+                  const zeroOffset = max / range
+
+                  const corBase = key === 'receitaBruta' ? '#3b82f6' : key === 'receitaLiquida' ? '#8b5cf6' : '#10b981'
+
+                  return (
+                    <linearGradient key={key} id={`grad-${key}`} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset={Math.max(0, Math.min(1, zeroOffset))} stopColor={corBase} />
+                      <stop offset={Math.max(0, Math.min(1, zeroOffset))} stopColor="#ef4444" />
+                    </linearGradient>
+                  )
+                })}
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="periodo" tick={{ fontSize: 11 }} />
+              <YAxis tickFormatter={fmtShort} tick={{ fontSize: 11 }} />
+              <Tooltip
+                content={({ active, payload, label }) => {
+                  if (!active || !payload) return null
+                  return (
+                    <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs shadow-sm">
+                      <p className="font-medium text-gray-700 mb-1">{label}</p>
+                      {payload.map((p, i) => (
+                        <p key={i} style={{ color: p.value < 0 ? '#ef4444' : p.color }}>
+                          {p.name}: {fmt(p.value)}
+                        </p>
+                      ))}
+                    </div>
+                  )
+                }}
+              />
+              <Legend wrapperStyle={{ fontSize: 12 }} />
+              <ReferenceLine y={0} stroke="#9ca3af" strokeWidth={1} />
+              <Line type="monotone" dataKey="receitaBruta" name="Receita Bruta" stroke="url(#grad-receitaBruta)" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="receitaLiquida" name="Receita Líquida" stroke="url(#grad-receitaLiquida)" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="lucroLiquido" name="Lucro Líquido" stroke="url(#grad-lucroLiquido)" strokeWidth={2} dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
 
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <h2 className="text-sm font-medium text-gray-700 mb-6">Custos Operacionais por Período</h2>
