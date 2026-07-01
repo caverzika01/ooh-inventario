@@ -28,7 +28,7 @@ const ATIVOS = [
 const fmt = v => `R$ ${Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`
 const fmtShort = v => `R$ ${(Number(v) / 1000).toFixed(0)}k`
 
-export default function FluxoCaixa() {
+export default function FluxoCaixa({ readOnly = false }) {
   const [periodo, setPeriodo] = useState('')
   const [valores, setValores] = useState({})
   const [loading, setLoading] = useState(false)
@@ -168,26 +168,29 @@ export default function FluxoCaixa() {
                       placeholder="0,00"
                       value={valores[ativo.key] || ''}
                       onChange={e => setValores({ ...valores, [ativo.key]: e.target.value })}
-                      className="w-full border border-gray-200 rounded-lg pl-8 pr-3 py-2 text-sm focus:outline-none focus:border-blue-400"
+                      disabled={readOnly}
+                      className="w-full border border-gray-200 rounded-lg pl-8 pr-3 py-2 text-sm focus:outline-none focus:border-blue-400 disabled:bg-gray-50 disabled:text-gray-400"
                     />
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
-              <div>
-                <p className="text-xs text-gray-400">Total de investimentos</p>
-                <p className="text-lg font-semibold text-purple-600">{fmt(totalInvestimento)}</p>
+            {!readOnly && (
+              <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-gray-400">Total de investimentos</p>
+                  <p className="text-lg font-semibold text-purple-600">{fmt(totalInvestimento)}</p>
+                </div>
+                <button
+                  onClick={salvar}
+                  disabled={loading}
+                  className="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {loading ? 'Salvando...' : 'Salvar'}
+                </button>
               </div>
-              <button
-                onClick={salvar}
-                disabled={loading}
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-              >
-                {loading ? 'Salvando...' : 'Salvar'}
-              </button>
-            </div>
+            )}
 
             {sucesso && (
               <p className="text-green-600 text-sm mt-3 text-right">Salvo com sucesso!</p>

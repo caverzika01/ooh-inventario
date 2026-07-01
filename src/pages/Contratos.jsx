@@ -7,7 +7,7 @@ const PERIODOS = [
   '25/26','26/27','27/28','28/29','29/30'
 ]
 
-export default function Contratos() {
+export default function Contratos({ readOnly = false }) {
   const [clientes, setClientes] = useState([])
   const [contratos, setContratos] = useState([])
   const [clienteId, setClienteId] = useState('')
@@ -103,86 +103,90 @@ export default function Contratos() {
   return (
     <div className="max-w-3xl mx-auto">
       <h1 className="text-2xl font-semibold text-gray-800 mb-6">Contratos</h1>
+      {!readOnly && (
+        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+          <h2 className="text-sm font-medium text-gray-700 mb-4">Novo contrato</h2>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="col-span-2">
+              <label className="text-xs text-gray-500 mb-1 block">Cliente</label>
+              <select
+                value={clienteId}
+                onChange={e => setClienteId(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-400"
+              >
+                <option value="">Selecione o cliente</option>
+                {clientes.map(c => (
+                  <option key={c.id} value={c.id}>{c.nome}</option>
+                ))}
+              </select>
+            </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-        <h2 className="text-sm font-medium text-gray-700 mb-4">Novo contrato</h2>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="col-span-2">
-            <label className="text-xs text-gray-500 mb-1 block">Cliente</label>
-            <select
-              value={clienteId}
-              onChange={e => setClienteId(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-400"
-            >
-              <option value="">Selecione o cliente</option>
-              {clientes.map(c => (
-                <option key={c.id} value={c.id}>{c.nome}</option>
-              ))}
-            </select>
+            <div className="col-span-2">
+              <label className="text-xs text-gray-500 mb-1 block">Descrição (opcional)</label>
+              <input
+                type="text"
+                placeholder="Ex: Contrato outdoor centro"
+                value={descricao}
+                onChange={e => setDescricao(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-400"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">Alíquota de imposto (%)</label>
+              <input
+                type="number"
+                placeholder="Ex: 12"
+                min="0"
+                max="18"
+                value={aliquota}
+                onChange={e => setAliquota(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-400"
+              />
+            </div>
+
+            <div></div>
+
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">Período início</label>
+              <select
+                value={periodoInicio}
+                onChange={e => setPeriodoInicio(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-400"
+              >
+                <option value="">Selecione</option>
+                {PERIODOS.map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
+            </div>
+
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">Período fim</label>
+              <select
+                value={periodoFim}
+                onChange={e => setPeriodoFim(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-400"
+              >
+                <option value="">Selecione</option>
+                {PERIODOS.map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
+            </div>
           </div>
 
-          <div className="col-span-2">
-            <label className="text-xs text-gray-500 mb-1 block">Descrição (opcional)</label>
-            <input
-              type="text"
-              placeholder="Ex: Contrato outdoor centro"
-              value={descricao}
-              onChange={e => setDescricao(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-400"
-            />
-          </div>
+          {erro && <p className="text-red-500 text-sm mt-3">{erro}</p>}
 
-          <div>
-            <label className="text-xs text-gray-500 mb-1 block">Alíquota de imposto (%)</label>
-            <input
-              type="number"
-              placeholder="Ex: 12"
-              min="0"
-              max="18"
-              value={aliquota}
-              onChange={e => setAliquota(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-400"
-            />
-          </div>
-
-          <div></div>
-
-          <div>
-            <label className="text-xs text-gray-500 mb-1 block">Período início</label>
-            <select
-              value={periodoInicio}
-              onChange={e => setPeriodoInicio(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-400"
-            >
-              <option value="">Selecione</option>
-              {PERIODOS.map(p => <option key={p} value={p}>{p}</option>)}
-            </select>
-          </div>
-
-          <div>
-            <label className="text-xs text-gray-500 mb-1 block">Período fim</label>
-            <select
-              value={periodoFim}
-              onChange={e => setPeriodoFim(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-400"
-            >
-              <option value="">Selecione</option>
-              {PERIODOS.map(p => <option key={p} value={p}>{p}</option>)}
-            </select>
-          </div>
+          {!readOnly && (
+            <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+              {<button
+                onClick={adicionarContrato}
+                disabled={loading}
+                className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+              >
+                {loading ? 'Salvando...' : 'Adicionar contrato'}
+              </button>}
+            </div>
+            )}
         </div>
-
-        {erro && <p className="text-red-500 text-sm mt-3">{erro}</p>}
-
-        <button
-          onClick={adicionarContrato}
-          disabled={loading}
-          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-        >
-          {loading ? 'Salvando...' : 'Adicionar contrato'}
-        </button>
-      </div>
-
+      )}
       <div className="bg-white rounded-lg border border-gray-200">
         {contratos.length === 0 ? (
           <p className="text-gray-400 text-sm text-center py-8">Nenhum contrato cadastrado ainda</p>
@@ -193,7 +197,7 @@ export default function Contratos() {
                 key={contrato.id}
                 className={`px-6 py-4 ${i !== contratos.length - 1 ? 'border-b border-gray-100' : ''}`}
               >
-                {editando === contrato.id ? (
+                {editando === contrato.id && !readOnly ? (
                   <div className="grid grid-cols-2 gap-3">
                     <div className="col-span-2">
                       <label className="text-xs text-gray-500 mb-1 block">Cliente</label>
@@ -269,20 +273,12 @@ export default function Contratos() {
                         Alíquota: {(contrato.aliquota_imposto * 100).toFixed(0)}%
                       </p>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <button
-                        onClick={() => iniciarEdicao(contrato)}
-                        className="text-blue-400 text-sm hover:text-blue-600"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => deletarContrato(contrato.id)}
-                        className="text-red-400 text-sm hover:text-red-600"
-                      >
-                        Excluir
-                      </button>
-                    </div>
+                    {!readOnly && (
+                      <div className="flex items-center gap-4">
+                        <button onClick={() => iniciarEdicao(contrato)} className="text-blue-400 text-sm hover:text-blue-600">Editar</button>
+                        <button onClick={() => deletarContrato(contrato.id)} className="text-red-400 text-sm hover:text-red-600">Excluir</button>
+                      </div>
+                    )}
                   </div>
                 )}
               </li>

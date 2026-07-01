@@ -10,7 +10,7 @@ function formatarCNPJ(valor) {
     .replace(/(\d{4})(\d)/, '$1-$2')
 }
 
-export default function Clientes() {
+export default function Clientes({ readOnly = false }) {
   const [clientes, setClientes] = useState([])
   const [nome, setNome] = useState('')
   const [cnpj, setCnpj] = useState('')
@@ -140,13 +140,15 @@ export default function Clientes() {
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold text-gray-800">Clientes</h1>
-        <button
-          onClick={() => { setMostrarForm(!mostrarForm); setErro('') }}
-          className="text-white px-4 py-2 rounded-lg text-sm font-medium"
-          style={{ background: '#a8c037' }}
-        >
-          {mostrarForm ? 'Cancelar' : '+ Novo cliente'}
-        </button>
+        {!readOnly && (
+          <button
+            onClick={() => { setMostrarForm(!mostrarForm); setErro('') }}
+            className="text-white px-4 py-2 rounded-lg text-sm font-medium"
+            style={{ background: '#a8c037' }}
+          >
+            {mostrarForm ? 'Cancelar' : '+ Novo cliente'}
+          </button>
+        )}
       </div>
 
       {mostrarForm && (
@@ -246,7 +248,7 @@ export default function Clientes() {
                 key={cliente.id}
                 className={`px-6 py-4 ${i !== clientes.length - 1 ? 'border-b border-gray-100' : ''}`}
               >
-                {editando === cliente.id ? (
+                {editando === cliente.id && !readOnly ? (
                   <div className="space-y-4">
                     <div>
                       <label className="text-xs text-gray-500 mb-1 block">CNPJ</label>
@@ -339,21 +341,12 @@ export default function Clientes() {
                         <p className="text-xs text-gray-400">{cliente.endereco}</p>
                       )}
                     </div>
-                    <div className="flex items-center gap-4 flex-shrink-0 ml-4">
-                      <button
-                        onClick={() => iniciarEdicao(cliente)}
-                        className="text-xs hover:opacity-70"
-                        style={{ color: '#a8c037' }}
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => deletarCliente(cliente.id)}
-                        className="text-red-400 text-xs hover:text-red-600"
-                      >
-                        Excluir
-                      </button>
-                    </div>
+                    {!readOnly && (
+                      <div className="flex items-center gap-4 flex-shrink-0 ml-4">
+                        <button onClick={() => iniciarEdicao(cliente)} className="text-xs hover:opacity-70" style={{ color: '#a8c037' }}>Editar</button>
+                        <button onClick={() => deletarCliente(cliente.id)} className="text-red-400 text-xs hover:text-red-600">Excluir</button>
+                      </div>
+                    )}
                   </div>
                 )}
               </li>

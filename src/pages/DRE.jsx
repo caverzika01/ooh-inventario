@@ -22,7 +22,7 @@ const CAMPOS_MANUAIS = [
   { key: 'servicos_publicos', label: 'Serviços Públicos (Elektro etc.)' },
 ]
 
-export default function DRE() {
+export default function DRE({ readOnly = false }) {
   const [periodo, setPeriodo] = useState('')
   const [dre, setDre] = useState({})
   const [receitaBruta, setReceitaBruta] = useState(0)
@@ -184,7 +184,8 @@ export default function DRE() {
                       placeholder="0,00"
                       value={dre[campo.key] || ''}
                       onChange={e => setDre({ ...dre, [campo.key]: e.target.value })}
-                      className="w-full border border-gray-200 rounded-lg pl-8 pr-3 py-2 text-sm focus:outline-none focus:border-blue-400"
+                      disabled={readOnly}
+                      className="w-full border border-gray-200 rounded-lg pl-8 pr-3 py-2 text-sm focus:outline-none focus:border-blue-400 disabled:bg-gray-50 disabled:text-gray-400"
                     />
                   </div>
                 </div>
@@ -213,6 +214,7 @@ export default function DRE() {
                       placeholder="0,00"
                       value={dre[campo.key] || ''}
                       onChange={e => setDre({ ...dre, [campo.key]: e.target.value })}
+                      disabled={readOnly}
                       className="w-full border border-gray-200 rounded-lg pl-8 pr-3 py-2 text-sm focus:outline-none focus:border-blue-400"
                     />
                   </div>
@@ -234,16 +236,18 @@ export default function DRE() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-2">
-            {sucesso && <p className="text-green-600 text-sm">Salvo com sucesso!</p>}
-            <button
-              onClick={salvarDRE}
-              disabled={loading}
-              className="ml-auto bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-            >
-              {loading ? 'Salvando...' : 'Salvar DRE'}
-            </button>
-          </div>
+          {!readOnly && (
+            <div className="flex items-center justify-between pt-2">
+              {sucesso && <p className="text-green-600 text-sm">Salvo com sucesso!</p>}
+              <button
+                onClick={salvarDRE}
+                disabled={loading}
+                className="ml-auto bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+              >
+                {loading ? 'Salvando...' : 'Salvar DRE'}
+              </button>
+            </div>
+          )}
         </div>
       )}
 

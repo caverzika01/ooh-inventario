@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom'
+import { supabase } from './lib/supabase'
 import Clientes from './pages/Clientes'
 import Contratos from './pages/Contratos'
 import Receita from './pages/Receita'
@@ -6,13 +7,14 @@ import DRE from './pages/DRE'
 import Dashboard from './pages/Dashboard'
 import FluxoCaixa from './pages/FluxoCaixa'
 import Despesas from './pages/Despesas'
-import { supabase } from './lib/supabase'
 import Energia from './pages/Energia'
 import Importar from './pages/Importar'
 
-function Layout({ children }) {
+function Layout({ children, role }) {
+  const isAdmin = role === 'admin'
+
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(to bottom, #c3eeb8, #ffffff)' }}>
+    <div className="min-h-screen" style={{ background: '#f3f4f6' }}>
       <nav className="px-6 py-4 shadow-sm" style={{ background: '#ffffff' }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-8">
@@ -26,7 +28,6 @@ function Layout({ children }) {
                 <path d="M100 65 L155 65" stroke="#a8c037" strokeWidth="10" strokeLinecap="round" fill="none"/>
               </g>
             </svg>
-            <span className="font-semibold" style={{ color: '#6b7280' }}>|</span>
             <NavLink to="/" className={({ isActive }) => isActive ? 'text-sm font-medium' : 'text-sm hover:opacity-70'} style={({ isActive }) => ({ color: isActive ? '#a8c037' : '#6b7280' })}>Dashboard</NavLink>
             <NavLink to="/clientes" className={({ isActive }) => isActive ? 'text-sm font-medium' : 'text-sm hover:opacity-70'} style={({ isActive }) => ({ color: isActive ? '#a8c037' : '#6b7280' })}>Clientes</NavLink>
             <NavLink to="/contratos" className={({ isActive }) => isActive ? 'text-sm font-medium' : 'text-sm hover:opacity-70'} style={({ isActive }) => ({ color: isActive ? '#a8c037' : '#6b7280' })}>Contratos</NavLink>
@@ -35,15 +36,22 @@ function Layout({ children }) {
             <NavLink to="/fluxo-caixa" className={({ isActive }) => isActive ? 'text-sm font-medium' : 'text-sm hover:opacity-70'} style={({ isActive }) => ({ color: isActive ? '#a8c037' : '#6b7280' })}>Fluxo de Caixa</NavLink>
             <NavLink to="/despesas" className={({ isActive }) => isActive ? 'text-sm font-medium' : 'text-sm hover:opacity-70'} style={({ isActive }) => ({ color: isActive ? '#a8c037' : '#6b7280' })}>Despesas</NavLink>
             <NavLink to="/energia" className={({ isActive }) => isActive ? 'text-sm font-medium' : 'text-sm hover:opacity-70'} style={({ isActive }) => ({ color: isActive ? '#a8c037' : '#6b7280' })}>Energia</NavLink>
-            <NavLink to="/importar" className={({ isActive }) => isActive ? 'text-sm font-medium' : 'text-sm hover:opacity-70'} style={({ isActive }) => ({ color: isActive ? '#a8c037' : '#6b7280' })}>Importar</NavLink>
+            {isAdmin && (
+              <NavLink to="/importar" className={({ isActive }) => isActive ? 'text-sm font-medium' : 'text-sm hover:opacity-70'} style={({ isActive }) => ({ color: isActive ? '#a8c037' : '#6b7280' })}>Importar</NavLink>
+            )}
           </div>
-          <button
-            onClick={() => supabase.auth.signOut()}
-            className="text-sm hover:opacity-70"
-            style={{ color: '#6b7280' }}
-          >
-            Sair
-          </button>
+          <div className="flex items-center gap-4">
+            <span className="text-xs px-2 py-1 rounded-full" style={{ background: isAdmin ? '#f0f7d4' : '#f3f4f6', color: isAdmin ? '#a8c037' : '#9ca3af' }}>
+              {isAdmin ? 'Admin' : 'Visualizador'}
+            </span>
+            <button
+              onClick={() => supabase.auth.signOut()}
+              className="text-sm hover:opacity-70"
+              style={{ color: '#6b7280' }}
+            >
+              Sair
+            </button>
+          </div>
         </div>
       </nav>
       <main className="p-6">{children}</main>
@@ -51,22 +59,24 @@ function Layout({ children }) {
   )
 }
 
-export default function AppRoutes() {
+export default function AppRoutes({ role }) {
+  const isAdmin = role === 'admin'
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/*" element={
-          <Layout>
+          <Layout role={role}>
             <Routes>
               <Route path="/" element={<Dashboard />} />
-              <Route path="/clientes" element={<Clientes />} />
-              <Route path="/contratos" element={<Contratos />} />
-              <Route path="/receita" element={<Receita />} />
-              <Route path="/dre" element={<DRE />} />
-              <Route path="/fluxo-caixa" element={<FluxoCaixa />} />
-              <Route path="/despesas" element={<Despesas />} />
-              <Route path="/energia" element={<Energia />} />
-              <Route path="/importar" element={<Importar />} />
+              <Route path="/clientes" element={<Clientes readOnly={!isAdmin} />} />
+              <Route path="/contratos" element={<Contratos readOnly={!isAdmin} />} />
+              <Route path="/receita" element={<Receita readOnly={!isAdmin} />} />
+              <Route path="/dre" element={<DRE readOnly={!isAdmin} />} />
+              <Route path="/fluxo-caixa" element={<FluxoCaixa readOnly={!isAdmin} />} />
+              <Route path="/despesas" element={<Despesas readOnly={!isAdmin} />} />
+              <Route path="/energia" element={<Energia readOnly={!isAdmin} />} />
+              {isAdmin && <Route path="/importar" element={<Importar />} />}
             </Routes>
           </Layout>
         } />

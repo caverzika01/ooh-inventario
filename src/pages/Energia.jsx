@@ -9,7 +9,7 @@ const MESES = [
 const ANOS = Array.from({ length: 16 }, (_, i) => 2015 + i)
 const fmt = v => Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
-export default function Energia() {
+export default function Energia({ readOnly = false }) {
   const [instalacoes, setInstalacoes] = useState([])
   const [contas, setContas] = useState([])
   const [anoSelecionado, setAnoSelecionado] = useState(2018)
@@ -155,15 +155,17 @@ export default function Energia() {
     <div className="max-w-full mx-auto px-4 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-gray-800">Rede de Energia (Elektro)</h1>
-        <button
-          onClick={() => { setMostrarForm(!mostrarForm); setErro('') }}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
-        >
-          {mostrarForm ? 'Cancelar' : '+ Nova instalação'}
-        </button>
+        {!readOnly && (
+          <button
+            onClick={() => { setMostrarForm(!mostrarForm); setErro('') }}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
+          >
+            {mostrarForm ? 'Cancelar' : '+ Nova instalação'}
+          </button>
+        )}
       </div>
 
-      {mostrarForm && (
+      {!readOnly && mostrarForm && (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-sm font-medium text-gray-700 mb-4">Nova instalação</h2>
           <div className="grid grid-cols-2 gap-4">
@@ -349,14 +351,16 @@ export default function Energia() {
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2 justify-end">
-                            <button onClick={() => abrirValores(inst)}
-                              className="text-green-500 text-xs hover:text-green-700 whitespace-nowrap">Valores</button>
-                            <button onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(inst.local_instalacao)}`, '_blank')}
-                              className="text-purple-400 text-xs hover:text-purple-600 whitespace-nowrap">Maps</button>
-                            <button onClick={() => { setEditando(inst.id); setFormEdit({ titular: inst.titular, codigo: inst.codigo, medidor: inst.medidor || '', local_instalacao: inst.local_instalacao || '', status: inst.status, observacao: inst.observacao || '' }) }}
-                              className="text-blue-400 text-xs hover:text-blue-600">Editar</button>
-                            <button onClick={() => deletar(inst.id)}
-                              className="text-red-400 text-xs hover:text-red-600">Excluir</button>
+                            {!readOnly && (
+                              <button onClick={() => abrirValores(inst)} className="text-green-500 text-xs hover:text-green-700 whitespace-nowrap">Valores</button>
+                            )}
+                            <button onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(inst.local_instalacao)}`, '_blank')} className="text-purple-400 text-xs hover:text-purple-600 whitespace-nowrap">Maps</button>
+                            {!readOnly && (
+                              <>
+                                <button onClick={() => { setEditando(inst.id); setFormEdit({ titular: inst.titular, codigo: inst.codigo, medidor: inst.medidor || '', local_instalacao: inst.local_instalacao || '', status: inst.status, observacao: inst.observacao || '' }) }} className="text-blue-400 text-xs hover:text-blue-600">Editar</button>
+                                <button onClick={() => deletar(inst.id)} className="text-red-400 text-xs hover:text-red-600">Excluir</button>
+                              </>
+                            )}
                           </div>
                         </td>
                       </>
@@ -400,7 +404,7 @@ export default function Energia() {
               <tbody>
                 {desligadas.map((inst, i) => (
                   <tr key={inst.id} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    {editando === inst.id ? (
+                    {editando === inst.id && !readOnly ? (
                       <td colSpan={5} className="px-4 py-3">
                         <div className="grid grid-cols-3 gap-3">
                           <div>

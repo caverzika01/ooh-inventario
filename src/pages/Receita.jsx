@@ -7,7 +7,7 @@ const PERIODOS = [
   '25/26','26/27','27/28','28/29','29/30'
 ]
 
-export default function Receita() {
+export default function Receita({ readOnly = false }) {
   const [contratos, setContratos] = useState([])
   const [contratoId, setContratoId] = useState('')
   const [contratoSelecionado, setContratoSelecionado] = useState(null)
@@ -126,7 +126,8 @@ export default function Receita() {
                     placeholder="0,00"
                     value={valores[periodo] || ''}
                     onChange={e => setValores({ ...valores, [periodo]: e.target.value })}
-                    className="w-full border border-gray-200 rounded-lg pl-8 pr-4 py-2 text-sm focus:outline-none focus:border-blue-400"
+                    disabled={readOnly}
+                    className="w-full border border-gray-200 rounded-lg pl-8 pr-4 py-2 text-sm focus:outline-none focus:border-blue-400 disabled:bg-gray-50 disabled:text-gray-400"
                   />
                 </div>
                 <span className="text-xs text-gray-400 w-32 text-right">
@@ -143,13 +144,18 @@ export default function Receita() {
                 R$ {periodosContrato.reduce((acc, p) => acc + parseFloat(valores[p] || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </p>
             </div>
-            <button
-              onClick={salvarValores}
-              disabled={loading}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-            >
-              {loading ? 'Salvando...' : 'Salvar valores'}
-            </button>
+            {!readOnly && (
+              <div className="flex items-center justify-between pt-2">
+                {sucesso && <p className="text-green-600 text-sm">Salvo com sucesso!</p>}
+                <button
+                  onClick={salvarValores}
+                  disabled={loading}
+                  className="ml-auto bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {loading ? 'Salvando...' : 'Salvar valores'}
+                </button>
+              </div>
+            )}
           </div>
 
           {sucesso && (

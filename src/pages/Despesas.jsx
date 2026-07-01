@@ -15,7 +15,7 @@ const CATEGORIAS = [
 
 const fmt = v => Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
-export default function Despesas() {
+export default function Despesas({ readOnly = false }) {
   const [itens, setItens] = useState([])
   const [categoriaFiltro, setCategoriaFiltro] = useState('')
   const [loading, setLoading] = useState(false)
@@ -127,15 +127,17 @@ export default function Despesas() {
     <div className="max-w-5xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-gray-800">Despesas</h1>
-        <button
-          onClick={() => { setMostrarForm(!mostrarForm); setErro(''); setSucesso(false) }}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
-        >
-          {mostrarForm ? 'Cancelar' : '+ Nova despesa'}
-        </button>
+        {!readOnly && (
+          <button
+            onClick={() => { setMostrarForm(!mostrarForm); setErro(''); setSucesso(false) }}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
+          >
+            {mostrarForm ? 'Cancelar' : '+ Nova despesa'}
+          </button>
+        )}
       </div>
 
-      {mostrarForm && (
+      {!readOnly && mostrarForm && (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-sm font-medium text-gray-700 mb-4">Nova despesa</h2>
           <div className="grid grid-cols-2 gap-4">
@@ -285,7 +287,7 @@ export default function Despesas() {
                     const saldo = parseFloat(item.valor_contratado) - parseFloat(item.valor_realizado)
                     return (
                       <tr key={item.id} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                        {editando === item.id ? (
+                        {editando === item.id && !readOnly ? (
                           <td colSpan={7} className="px-6 py-4">
                             <div className="grid grid-cols-3 gap-3">
                               <div>
@@ -382,20 +384,22 @@ export default function Despesas() {
                               {fmt(saldo)}
                             </td>
                             <td className="px-6 py-3 text-right">
-                              <div className="flex items-center justify-end gap-3">
-                                <button
-                                  onClick={() => iniciarEdicao(item)}
-                                  className="text-blue-400 text-xs hover:text-blue-600"
-                                >
-                                  Editar
-                                </button>
-                                <button
-                                  onClick={() => deletar(item.id)}
-                                  className="text-red-400 text-xs hover:text-red-600"
-                                >
-                                  Excluir
-                                </button>
-                              </div>
+                              {!readOnly && (
+                                <div className="flex items-center justify-end gap-3">
+                                  <button
+                                    onClick={() => iniciarEdicao(item)}
+                                    className="text-blue-400 text-xs hover:text-blue-600"
+                                  >
+                                    Editar
+                                  </button>
+                                  <button
+                                    onClick={() => deletar(item.id)}
+                                    className="text-red-400 text-xs hover:text-red-600"
+                                  >
+                                    Excluir
+                                  </button>
+                                </div>
+                              )}
                             </td>
                           </>
                         )}
