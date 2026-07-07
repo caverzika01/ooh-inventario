@@ -131,14 +131,6 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {melhorPeriodo && melhorPeriodo.lucroLiquido > 0 && (
-        <div className="bg-green-50 border border-green-100 rounded-lg px-6 py-4">
-          <p className="text-sm text-green-700">
-            Melhor período: <span className="font-semibold">{melhorPeriodo.periodo}</span> com lucro líquido de <span className="font-semibold">{fmt(melhorPeriodo.lucroLiquido)}</span>
-          </p>
-        </div>
-      )}
-
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-sm font-medium text-gray-700 mb-6">Receita Bruta × Receita Líquida × Lucro Líquido</h2>
           <ResponsiveContainer width="100%" height={280}>
@@ -166,15 +158,19 @@ export default function Dashboard() {
               <YAxis tickFormatter={fmtShort} tick={{ fontSize: 11 }} />
               <Tooltip
                 content={({ active, payload, label }) => {
-                  if (!active || !payload) return null
+                  if (!active || !payload || !payload.length) return null
                   return (
                     <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs shadow-sm">
                       <p className="font-medium text-gray-700 mb-1">{label}</p>
-                      {payload.map((p, i) => (
-                        <p key={i} style={{ color: p.value < 0 ? '#ef4444' : p.color }}>
-                          {p.name}: {fmt(p.value)}
-                        </p>
-                      ))}
+                      {payload.map((p, i) => {
+                        const isNegativo = typeof p.value === 'number' && p.value < 0
+                        const corOriginal = p.dataKey === 'receitaBruta' ? '#3b82f6' : p.dataKey === 'receitaLiquida' ? '#8b5cf6' : '#10b981'
+                        return (
+                          <p key={i} style={{ color: isNegativo ? '#ef4444' : corOriginal }}>
+                            {p.name}: {fmt(p.value)}
+                          </p>
+                        )
+                      })}
                     </div>
                   )
                 }}

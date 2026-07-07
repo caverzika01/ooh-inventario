@@ -142,7 +142,17 @@ export default function Clientes({ readOnly = false }) {
         <h1 className="text-2xl font-semibold text-gray-800">Clientes</h1>
         {!readOnly && (
           <button
-            onClick={() => { setMostrarForm(!mostrarForm); setErro('') }}
+            onClick={() => {
+              if (mostrarForm) {
+                setNome('')
+                setCnpj('')
+                setRazaoSocial('')
+                setNomeFantasia('')
+                setEndereco('')
+                setErro('')
+              }
+              setMostrarForm(!mostrarForm)
+            }}
             className="text-white px-4 py-2 rounded-lg text-sm font-medium"
             style={{ background: '#a8c037' }}
           >
@@ -227,14 +237,29 @@ export default function Clientes({ readOnly = false }) {
 
           {erro && <p className="text-red-500 text-sm mt-3">{erro}</p>}
 
-          <button
-            onClick={adicionarCliente}
-            disabled={loading}
-            className="mt-4 text-white px-6 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
-            style={{ background: '#a8c037' }}
-          >
-            {loading ? 'Salvando...' : 'Salvar cliente'}
-          </button>
+          <div className="mt-4 flex gap-3">
+            <button
+              onClick={adicionarCliente}
+              disabled={loading}
+              className="text-white px-6 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
+              style={{ background: '#a8c037' }}
+            >
+              {loading ? 'Salvando...' : 'Salvar cliente'}
+            </button>
+            <button
+              onClick={() => {
+                setNome('')
+                setCnpj('')
+                setRazaoSocial('')
+                setNomeFantasia('')
+                setEndereco('')
+                setErro('')
+              }}
+              className="px-6 py-2 rounded-lg text-sm font-medium border border-gray-200 text-gray-500 hover:bg-gray-50"
+            >
+              Limpar
+            </button>
+</div>
         </div>
       )}
 

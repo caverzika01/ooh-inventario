@@ -122,7 +122,7 @@ export default function Contratos({ readOnly = false }) {
             </div>
 
             <div className="col-span-2">
-              <label className="text-xs text-gray-500 mb-1 block">Descrição (opcional)</label>
+              <label className="text-xs text-gray-500 mb-1 block">Descrição</label>
               <input
                 type="text"
                 placeholder="Ex: Contrato outdoor centro"
